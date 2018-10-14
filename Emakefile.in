@@ -1,0 +1,2 @@
+%% -*- mode: erlang; coding: utf-8; indent-tabs-mode: nil; -*-
+{[@gun_modules@],[{i,"@gun_include_dir@"},{outdir,"@gun_binary_dir@"}]}.
