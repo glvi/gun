@@ -28,6 +28,8 @@
 -export([down/1]).
 -export([ws_upgrade/7]).
 
+-include_lib("kernel/include/logger.hrl").
+
 -type io() :: head | {body, non_neg_integer()} | body_close | body_chunked | body_trailer.
 
 %% @todo Make that a record.
@@ -607,6 +609,7 @@ ws_handshake(Buffer, State, StreamRef, Headers, Key, GunExtensions, Opts) ->
 		{_, Accept} ->
 			case cow_ws:encode_key(Key) of
 				Accept ->
+                                        ?LOG_DEBUG("Handshake accepted"),
 					ws_handshake_extensions(Buffer, State, StreamRef,
 						Headers, GunExtensions, Opts);
 				_ ->
@@ -646,6 +649,7 @@ ws_validate_extensions(_, _, _, _) ->
 
 %% @todo Validate protocols.
 ws_handshake_protocols(Buffer, State, StreamRef, Headers, Extensions, Opts) ->
+        ?LOG_DEBUG("Establishing protocols"),
 	case lists:keyfind(<<"sec-websocket-protocol">>, 1, Headers) of
 		false ->
 			ws_handshake_end(Buffer, State, StreamRef, Headers, Extensions,
@@ -657,6 +661,7 @@ ws_handshake_protocols(Buffer, State, StreamRef, Headers, Extensions, Opts) ->
 					ws_handshake_end(Buffer, State, StreamRef,
 						Headers, Extensions, Handler, Opts);
 				false ->
+                                        ?LOG_ERROR("Protocol not found: ~tp~n", [Proto]),
 					close
 			end
 	end.
@@ -671,4 +676,5 @@ ws_handshake_end(Buffer, #http_state{owner=Owner, socket=Socket, transport=Trans
 			{OK, _, _} = Transport:messages(),
 			self() ! {OK, Socket, Buffer}
 	end,
+        ?LOG_DEBUG("Initiating web socket connection"),
 	gun_ws:init(Owner, Socket, Transport, StreamRef, Headers, Extensions, Handler, Opts).
