@@ -38,7 +38,7 @@ add_custom_target(Gun
   WORKING_DIRECTORY ${gun_source_dir}
   VERBATIM
   COMMAND_EXPAND_LISTS)
-add_dependencies(Gun ErlangOTP)
+#add_dependencies(Gun ErlangOTP)
 set(URBANATM_GUN_OBJECTS ${GUN_OBJECTS} CACHE INTERNAL "UrbanATM Erlang Gun objects" FORCE)
 add_custom_target(DialyzeGun
   COMMAND ${DIALYZER_PROGRAM}
